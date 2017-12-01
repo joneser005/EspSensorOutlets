@@ -10,7 +10,7 @@
 #include "local-config.h"
 
 /****************************************************************************************/
-#define MQTT_KEEPALIVE 5*60+10  // overrides PubSubClient.h
+#define MQTT_KEEPALIVE 60+10  // overrides PubSubClient.h
 #define MQTT_PUB_SPAN_MS 100  // publishing messages in rapid success seems to be problematic?
 const unsigned long ENV_UPDATE_SECS = MQTT_KEEPALIVE-10;
 #define DHT11_PIN 5
@@ -207,11 +207,6 @@ void publishFloat(const char * topic, const float val) {
   publishString(topic, sval);
 }
 
-void publishInt(const char * topic, const int val) {
-  char sval[10];
-  itoa(val, sval, 10);
-  publishString(topic, sval);
-}
 
 void publishString(const char * topic, const char * val) {
   Serial.print("MQTT client is connected?  ");
@@ -224,7 +219,7 @@ void publishString(const char * topic, const char * val) {
   while (millis() < lastPubTime + MQTT_PUB_SPAN_MS) {
     delay(20);
   }
-  if (mqttClient.publish(topic, val)) {
+  if (mqttClient.publish(topic, val, true)) {
     lastPubTime = millis();
     Serial.println("succeeded");
   } else {
